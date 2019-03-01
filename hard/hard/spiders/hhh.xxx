@@ -1,0 +1,84 @@
+# -*- coding: utf-8 -*-
+import scrapy
+from scrapy import Spider
+from scrapy.http import Request
+
+class Article(scrapy.Item):
+    kg = scrapy.Field()
+    enrolled = scrapy.Field()
+    free_places = scrapy.Field()
+    not_enrolled = scrapy.Field()
+    region = scrapy.Field()
+    num_waiting = scrapy.Field()
+    waiting_list = scrapy.Field()
+    num_free = scrapy.Field()
+    with12p = scrapy.Field()
+    with11p = scrapy.Field()
+    with10p = scrapy.Field()
+    with9p = scrapy.Field()
+
+class HhhSpider(scrapy.Spider):
+    name = 'hhh'
+    allowed_domains = ['kg.sofia.bg']
+    start_urls = ['https://kg.sofia.bg/isodz/dz/by-region/all']
+
+    def parse(self, response):
+        #print(response.xpath('//table/tr/td/a/@href')[1].extract())
+        pages = response.xpath('//table/tr/td/a/@href').extract()
+        for page in pages:
+            abs_page = response.urljoin(page)
+            yield Request(abs_page,callback = self.parse_kg)
+            
+    def parse_kg(self,response):
+        #pass
+        kg = response.xpath('//*[@id="main"]/div[1]/div/text()').extract_first(default = "na").strip()
+        enrolled = response.xpath('//td[contains(text(),"2017")]/following-sibling::td[3]/text()').extract_first(default = "na")
+        free_places = response.xpath('//td[contains(text(),"2017")]/following-sibling::td[4]/text()').extract_first(default = "na")
+        not_enrolled = response.xpath('//td[contains(text(),"2017")]/following-sibling::td[5]/text()').extract_first(default = "na")
+        region = response.xpath('//td[contains(text(),"Район")]/following-sibling::td/strong/text()').extract_first(default = "na")
+        waiting_list = response.urljoin(response.xpath('//td[contains(text(),"2017")]/following-sibling::td/div/div/div/a/@href').extract_first())
+        
+         
+
+        article = Article()
+        article['kg'] = kg
+        article['enrolled'] = enrolled 
+        article['free_places'] = free_places 
+        article['not_enrolled'] = not_enrolled 
+        article['region'] = region
+        article['waiting_list'] = waiting_list if waiting_list else "na"
+        yield Request(waiting_list, meta={'item':article}, callback=self.parse_waiting)
+        
+    def parse_waiting(self, response):
+        final = response.request.meta['item']
+        num_waiting = response.xpath('//*[@id="main"]/div[1]/table[.//strong[contains(text(),"общи")]]/tr').extract()
+        num_free = response.xpath('//span/strong[contains(text(),"общи")]/text()').extract_first(default = "na").replace('Списък чакащи по общи критерии за ','').replace(' места','')
+        with12p = response.xpath('//*[@id="main"]/div[1]/table[.//strong[contains(text(),"общи")]]/tr[td = "12.0"]').extract()
+        with11p = response.xpath('//*[@id="main"]/div[1]/table[.//strong[contains(text(),"общи")]]/tr[td = "11.0"]').extract()
+        with10p = response.xpath('//*[@id="main"]/div[1]/table[.//strong[contains(text(),"общи")]]/tr[td = "10.0"]').extract()
+        with9p = response.xpath('//*[@id="main"]/div[1]/table[.//strong[contains(text(),"общи")]]/tr[td = "9.0"]').extract()
+        
+        final['num_waiting'] = len(num_waiting)-1 if num_waiting else "na"
+        final['num_free'] = num_free
+        final['with12p'] = len(with12p) if with12p else 'na'
+        final['with11p'] = len(with11p) if with11p else 'na'
+        final['with10p'] = len(with10p) if with10p else 'na'
+        final['with9p'] = len(with9p) if with9p else 'na'
+        
+        yield final
+        
+        #yield {'kg':kg,
+        #'year':'2017',
+        #'enrolled':enrolled,
+        #'free_places':free_places,
+        #'not_enrolled':not_enrolled,
+        #'region':region,
+        #'waiting_list':waiting_list
+        #}
+        #print(enrolled)
+        
+        #select num of waiting list for common criteria
+        #len(response.xpath('//*[@id="main"]/div[1]/table[.//strong[contains(text(),"общи")]]/tr').extract())-1
+        
+        #extract number of free places
+        #response.xpath('//span/strong[contains(text(),"общи")]/text()').extract_first().replace('Списък чакащи по общи критерии за ','').replace(' места','')
