@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Scrapy settings for hard project
+# Scrapy settings for kindergartens project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -9,14 +9,14 @@
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'hard'
+BOT_NAME = 'kindergartens'
 
-SPIDER_MODULES = ['hard.spiders']
-NEWSPIDER_MODULE = 'hard.spiders'
+SPIDER_MODULES = ['kindergartens.spiders']
+NEWSPIDER_MODULE = 'kindergartens.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'hard (+http://www.yourdomain.com)'
+#USER_AGENT = 'kindergartens (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
@@ -47,13 +47,13 @@ ROBOTSTXT_OBEY = False
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    'hard.middlewares.HardSpiderMiddleware': 543,
+#    'kindergartens.middlewares.KindergartensSpiderMiddleware': 543,
 #}
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    'hard.middlewares.HardDownloaderMiddleware': 543,
+#    'kindergartens.middlewares.KindergartensDownloaderMiddleware': 543,
 #}
 
 # Enable or disable extensions
@@ -65,7 +65,7 @@ ROBOTSTXT_OBEY = False
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 #ITEM_PIPELINES = {
-#    'hard.pipelines.HardPipeline': 300,
+#    'kindergartens.pipelines.KindergartensPipeline': 300,
 #}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -88,13 +88,12 @@ ROBOTSTXT_OBEY = False
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
-
 #Export as CSV Feed
 FEED_FORMAT = "csv"
-FEED_URI = "items_ver3.csv"
+FEED_URI = "export.csv"
 
 FEED_EXPORTERS = {
-    'csv': 'hard.exporters.FixLineCsvItemExporter',
+    'csv': 'kindergartens.exporters.FixLineCsvItemExporter',
 }
 
 #FEED_EXPORT_FIELDS = ['kg','region','waiting_list','enrolled','not_enrolled','free_places','num_waiting','with12p','with11p','with10p','with9p','num_free'] 

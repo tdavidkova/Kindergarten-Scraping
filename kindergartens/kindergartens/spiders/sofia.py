@@ -11,8 +11,8 @@ class Table(scrapy.Item):
     region = scrapy.Field()
     
 
-class AdmittedSpider(scrapy.Spider):
-    name = 'admitted'
+class SofiaSpider(scrapy.Spider):
+    name = 'sofia'
     allowed_domains = ['kg.sofia.bg']
     start_urls = ['https://kg.sofia.bg/isodz/dz/by-region/all']
 
