@@ -9,7 +9,7 @@ class Table(scrapy.Item):
     enrolled2016 = scrapy.Field()
     enrolled2015 = scrapy.Field()
     region = scrapy.Field()
-    
+    address = scrapy.Field()
 
 class SofiaSpider(scrapy.Spider):
     name = 'sofia'
@@ -30,6 +30,7 @@ class SofiaSpider(scrapy.Spider):
         enrolled2016 = response.xpath('//td[contains(text(),"2016")]/following-sibling::td[3]/text()').extract_first(default = "na")
         enrolled2015 = response.xpath('//td[contains(text(),"2015")]/following-sibling::td[3]/text()').extract_first(default = "na")
         region = response.xpath('//td[contains(text(),"Район")]/following-sibling::td/strong/text()').extract_first(default = "na")
+        address = response.xpath('//td[contains(text(),"Адрес")]/following-sibling::td//text()').get(default = "na")
         
          
 
@@ -39,6 +40,7 @@ class SofiaSpider(scrapy.Spider):
         article['enrolled2016'] = enrolled2016 
         article['enrolled2015'] = enrolled2015 
         article['region'] = region
+        article['address'] = address
         
         yield article
         
