@@ -90,7 +90,7 @@ ROBOTSTXT_OBEY = False
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 #Export as CSV Feed
 FEED_FORMAT = "csv"
-FEED_URI = "export.csv"
+FEED_URI = "export2.csv"
 
 FEED_EXPORTERS = {
     'csv': 'kindergartens.exporters.FixLineCsvItemExporter',
