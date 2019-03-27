@@ -1,27 +1,35 @@
 Sys.setlocale("LC_CTYPE", "bulgarian")
 library(dplyr)
 
+# library(doParallel) 
+# library(snow)
+# no_cores <- detectCores() - 1  
+# cl <- makeCluster(no_cores, type="SOCK")  
+# registerDoParallel(cl) 
+
 setwd("C:/Documents/GitHub/Kindergarten-Scraping/kindergartens")
 
 FullList <- read.csv("waiting.csv",stringsAsFactors = F)
 
 kg <- FullList %>%filter (born==2017)%>% select(region, kg, born) %>% distinct()
+kg<- kg %>% filter(region %in% c("????????????????????","??????????????","??????????????"))
 kg$id = 17004985
 kg$born = 2017
-kg$tail = "Общи"
+kg$tail = "????????"
 kg$places = 0
-kg$points <- ifelse(kg$region == "Подуяне", 11, 9)
+kg$points <- ifelse(kg$region == "??????????????", 11, 9)
 
-set.seed(1)
-for (l in (1:10)){
-  for (k in (1:nrow(kg))){
+set.seed(1000)
+#system.time(foreach(l=(1:nrow(kg))){
+for (l in 1:nrow(kg)) {
+  for (k in 1:50)  {
     FullList <- FullList %>% filter (born==2017) %>% select(id, kg, points, places, tail, born, region) 
     FullList_X <- FullList %>% filter(!id == 17004985)
     FullList_X <- rbind(FullList_X, kg[l,])
     
     FullList_X$rn <- runif(nrow(FullList_X))
     
-    dat <- FullList_X %>% filter (tail == "Социални") %>% arrange(desc (points), rn)
+    dat <- FullList_X %>% filter (tail == "????????????????") %>% arrange(desc (points), rn)
     dat$admitted = 0
     
     places <- dat %>% group_by(kg) %>% summarise(places = max(places)) %>% ungroup
@@ -39,7 +47,7 @@ for (l in (1:10)){
     
     admitted_s <- dat %>% filter(admitted==1) %>% select(id, kg) %>% distinct()
     
-    dat <- FullList_X %>% filter (tail == "Общи") %>% arrange(desc (points), rn)
+    dat <- FullList_X %>% filter (tail == "????????") %>% arrange(desc (points), rn)
     dat$admitted = 0
     
     places <- rbind(dat %>% group_by(kg) %>% summarise(places = max(places)) %>% ungroup,places)
