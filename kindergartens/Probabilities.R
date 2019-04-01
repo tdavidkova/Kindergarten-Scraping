@@ -1,5 +1,18 @@
 Sys.setlocale("LC_CTYPE", "bulgarian")
+##### SAVE WITH ENCODING MS-CYRL
+
 library(dplyr)
+library(snow)
+library(Hmisc)
+library(parallel)
+library(doParallel)
+
+numCores <- detectCores()
+numCores
+
+cl <- makeCluster(numCores)
+registerDoParallel(cl)
+
 
 setwd("C:/Documents/GitHub/Kindergarten-Scraping/kindergartens")
 
@@ -7,11 +20,11 @@ FullList <- read.csv("waiting.csv",stringsAsFactors = F)
 
 set.seed(100)
 
-system.time(for (k in (1:100)){
+runonce <- function(k) {
   FullList <- FullList %>% filter (born==2017) %>% select(id, kg, points, places, tail,born)  
   FullList$rn <- runif(nrow(FullList))
   
-  dat <- FullList %>% filter (tail == "????????????????") %>% arrange(desc (points), rn)
+  dat <- FullList %>% filter (tail == "Социални") %>% arrange(desc (points), rn)
   dat$admitted = 0
   
   places <- dat %>% select(kg, places) %>% distinct()
@@ -29,7 +42,7 @@ system.time(for (k in (1:100)){
   
   admitted_s <- dat %>% filter(admitted==1) %>% select(id, kg,points) %>% distinct()
   
-  dat <- FullList %>% filter (tail == "????????") %>% arrange(desc (points), rn)
+  dat <- FullList %>% filter (tail == "Общи") %>% arrange(desc (points), rn)
   dat$admitted = 0
   
   places <- rbind(dat %>% select(kg, places) %>% distinct(),places)
@@ -42,22 +55,31 @@ system.time(for (k in (1:100)){
       admitted <- c(admitted, dat[i, "id"])
     }
   }
-  sum(dat$admitted)
-  sum(places$places)
+
   
   admitted_o <- dat %>% filter(admitted==1) %>% select(id, kg,points) %>% distinct()
   
   ThisRunAdmitted <- data.frame("run" = k, rbind(admitted_s,admitted_o))
-  
-  if(exists("FullAdmitted")) {
-    FullAdmitted<-rbind(FullAdmitted, ThisRunAdmitted)
-  } else {
-    FullAdmitted<- ThisRunAdmitted
-  }
+
+  return(ThisRunAdmitted)
+
   
   rm(ThisRunAdmitted, admitted_s, admitted_o, places)
-  
-})
+}
+
+
+#system.time(x<-apply(1:4,runonce))
+clusterExport(cl,list("FullList"))
+
+system.time(FullAdmitted <-foreach (k = 1:6, .combine = rbind) %dopar% {
+  Sys.setlocale("LC_CTYPE", "bulgarian")
+  library(dplyr)
+  runonce(k)}
+  )
+
+
+stopCluster(cl) 
+
 
 runs <- max(FullAdmitted$run)
 chances <- FullAdmitted %>% group_by(id) %>% summarise(proba = length(id)/runs)
