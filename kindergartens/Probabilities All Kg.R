@@ -11,20 +11,21 @@ setwd("C:/Documents/GitHub/Kindergarten-Scraping/kindergartens")
 
 FullList <- read.csv("waiting.csv",stringsAsFactors = F)
 
-kg <- FullList %>%filter (born==2016)%>% select(region, kg, born) %>% distinct()
-kg<- kg %>% filter(region %in% c("Кремиковци","Надежда","Подуяне"))
-kg<- kg %>% filter(region %in% c("Подуяне"))
+kg <- FullList %>%filter (born==2017)%>% select(region, kg, born) %>% distinct()
+kg<- kg %>% filter(region %in% c("Кремиковци","Надежда"))
+#kg<- kg %>% filter(region %in% c("Подуяне"))
+#kg <- kg[c(8,10),]
 kg$id = 17004985
-kg$born = 2016
+kg$born = 2017
 kg$tail = "Общи"
 kg$places = 0
-kg$points <- ifelse(kg$region == "Подуяне", 12, 10)
+kg$points <- ifelse(kg$region == "Подуяне", 10, 8)
 
-set.seed(1000)
+set.seed(3000)
 #system.time(foreach(l=(1:nrow(kg))){
 for (l in 1:nrow(kg)) {
-  for (k in 1:10)  {
-    FullList <- FullList %>% filter (born==2016) %>% select(id, kg, points, places, tail, born, region) 
+  for (k in 1:20)  {
+    FullList <- FullList %>% filter (born==2017) %>% select(id, kg, points, places, tail, born, region) 
     FullList_X <- FullList %>% filter(!id == 17004985)
     FullList_X <- rbind(FullList_X, kg[l,])
     
