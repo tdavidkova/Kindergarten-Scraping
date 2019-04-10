@@ -71,7 +71,7 @@ runonce <- function(k) {
 #system.time(x<-apply(1:4,runonce))
 clusterExport(cl,list("FullList"))
 
-system.time(FullAdmitted <-foreach (k = 1:6, .combine = rbind) %dopar% {
+system.time(FullAdmitted <-foreach (k = 1:100, .combine = rbind) %dopar% {
   Sys.setlocale("LC_CTYPE", "bulgarian")
   library(dplyr)
   runonce(k)}
@@ -85,8 +85,8 @@ runs <- max(FullAdmitted$run)
 chances <- FullAdmitted %>% group_by(id) %>% summarise(proba = length(id)/runs)
 #x<-FullAdmitted %>% group_by(kg) %>% summarise(min(points))
 
-chances %>% filter(id ==17002770)
-FullAdmitted %>% filter(id ==17002770) %>% group_by(kg) %>% summarise(num = length(kg)/runs)
+chances %>% filter(id ==17004985)
+FullAdmitted %>% filter(id ==17004985) %>% group_by(kg) %>% summarise(num = length(kg)/runs)
 FullList %>% filter(id ==17002770) %>% select( kg,tail,points)
 FullList %>%filter(!id %in% chances$id & born==2017) %>% summarise(num = n_distinct(id))
 chances %>% summarise(num = n_distinct(id))
