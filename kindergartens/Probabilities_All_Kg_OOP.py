@@ -15,12 +15,13 @@ locale.setlocale(locale.LC_CTYPE, 'bulgarian')
 os.chdir("C:/Documents/GitHub/Kindergarten-Scraping/kindergartens") 
 
 idn = 17004985
-runs = 10
+runs = 100
 
 SelRegions = {} 
 
 SelRegions["Подуяне"] = 12
-SelRegions["Надежда"] = 10
+SelRegions["Надежда"] = 9
+SelRegions["Кремиковци"] = 9
 
 start = timeit.default_timer()
 
@@ -58,7 +59,7 @@ for key in KgList:
 
     apps = []    
 
-    for i in range(1,len(FullList)):
+    for i in range(len(FullList)):
         apps.append(App(idn = FullList.loc[i,'id'],
                         kg = FullList.loc[i, 'kg'],
                         points = FullList.loc[i,'points'],
@@ -73,7 +74,7 @@ for key in KgList:
         tail = "Общи",
         region = KgList[key]))
 
-    for k in range(1, runs+1):
+    for k in range(runs):
         places_loop = places.to_dict('index')
         for app in apps:
             app.rn = random.random()
@@ -111,4 +112,5 @@ for key,value in list_apps.items():
         if app.idn == idn:
             if app.admitted >0:
                 chances+=app.admitted
-    print("Вероятност за",key,chances/runs) 
+    if chances >0:
+        print("Вероятност за",key,chances/runs) 

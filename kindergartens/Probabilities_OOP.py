@@ -20,7 +20,7 @@ start = timeit.default_timer()
 
 FullList = pd.read_csv("waiting.csv",encoding='windows-1251') 
 
-FullList = FullList.loc[(FullList['born'] == 2017) &  (FullList['tail'] != "Хронични"), ]
+FullList = FullList.loc[(FullList['born'] == 2017) & (FullList['tail'] != "Хронични"), ]
 FullList.reset_index(inplace=True,drop = True)
 
 places = FullList[['kg','region','tail','places']].drop_duplicates()
@@ -28,7 +28,7 @@ places = pd.pivot_table(places, values = 'places', index=['kg','region'], column
 places.set_index('kg',inplace=True)
 
 class App:
-    def __init__ (self, idn, points, kg, preference, tail, region, rn=None, accepted = 0):
+    def __init__ (self, idn, points, kg, preference, tail, region, rn=None, admitted = 0):
         self.idn = idn
         self.points = points
         self.kg = kg
@@ -36,31 +36,31 @@ class App:
         self.tail = tail 
         self.region = region
         self.rn = rn
-        self.accepted = accepted
+        self.admitted = admitted
 
 apps = []    
 
-for i in range(1,len(FullList)):
+for i in range(len(FullList)):
     apps.append(App(idn = FullList.loc[i,'id'],
                     kg = FullList.loc[i, 'kg'],
                     points = FullList.loc[i,'points'],
                     preference = FullList.loc[i,'preference'],
                     tail = FullList.loc[i,'tail'],
                     region = FullList.loc[i,'region']))
-    
-random.seed(400)    
 
-for k in range(1, runs+1):
+random.seed(400)
+
+for k in range(runs):
     places_loop = places.to_dict('index')
     for app in apps:
         app.rn = random.random()
-    apps.sort(key=lambda x: (x.tail,-x.points,x.rn), reverse = False)      
+    apps.sort(key=lambda x: (x.tail,-x.points,x.rn), reverse = False)
     admitted = []
     for app in apps:
         if app.tail =="Социални":
            if places_loop[app.kg]['Социални']  >0:
                if not app.idn in admitted:
-                   app.accepted += 1 
+                   app.admitted += 1 
                    admitted.append(app.idn)
                    places_loop[app.kg]['Социални'] -= 1
     
@@ -72,7 +72,7 @@ for k in range(1, runs+1):
         if app.tail =="Общи":
            if places_loop[app.kg]['Общи']  >0:
                if not app.idn in admitted:
-                   app.accepted += 1 
+                   app.admitted += 1 
                    admitted.append(app.idn)
                    places_loop[app.kg]['Общи'] -= 1
                    
@@ -83,10 +83,13 @@ print(end-start)
 chances = 0
 for app in apps:
     if app.idn == 17004985:
-        if app.accepted >0:
-            chances+=app.accepted
-            print (app.kg,app.tail,app.preference,app.accepted/runs)
+        if app.admitted >0:
+            chances+=app.admitted
+            print (app.kg,app.tail,app.preference,app.admitted/runs)
 print("\nОбща вероятност",chances/runs)
+
+
+success=list(filter(lambda x: x.admitted>0 and x.idn == 17004985, apps))
 
   
 
