@@ -15,13 +15,13 @@ locale.setlocale(locale.LC_CTYPE, 'bulgarian')
 os.chdir("C:/Documents/GitHub/Kindergarten-Scraping/kindergartens") 
 
 idn = 17004985
-runs = 100
+runs = 1000
 
 SelRegions = {} 
 
 SelRegions["Подуяне"] = 12
-SelRegions["Надежда"] = 9
-SelRegions["Кремиковци"] = 9
+SelRegions["Надежда"] = 8
+SelRegions["Кремиковци"] = 8
 
 start = timeit.default_timer()
 
@@ -34,8 +34,12 @@ places = FullList[['kg','region','tail','places']].drop_duplicates()
 places = pd.pivot_table(places, values = 'places', index=['kg','region'], columns = 'tail',fill_value=0).reset_index()
 places.set_index('kg',inplace=True)
 
-KgList = places.loc[places['region'].isin(["Подуяне"]),]
+KgList = places.loc[places['region'].isin(["Подуяне","Кремиковци"]),]
 KgList = KgList['region'].to_dict()
+
+KgList = {item:KgList.get(item) for item in ["СДЯ №58","ДГ №69 Жар птица (с яслени групи)"]}
+
+ #["ДГ №110 Слънчева мечта (с яслени групи)","ДГ №89 Шарена дъга (с яслени групи)"]
 
 
 
@@ -51,7 +55,7 @@ class App:
         self.admitted = admitted
 
     
-random.seed(400)  
+random.seed(500)  
 
 list_apps = {}  
 
@@ -109,8 +113,9 @@ print(end-start)
 for key,value in list_apps.items():
     chances = 0
     for app in value:
-        if app.idn == idn:
+        if app.idn == idn: 
             if app.admitted >0:
                 chances+=app.admitted
     if chances >0:
         print("Вероятност за",key,chances/runs) 
+
