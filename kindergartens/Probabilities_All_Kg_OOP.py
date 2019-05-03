@@ -15,17 +15,15 @@ locale.setlocale(locale.LC_CTYPE, 'bulgarian')
 os.chdir("C:/Documents/GitHub/Kindergarten-Scraping/kindergartens") 
 
 idn = 17004985
-runs = 1000
-
-SelRegions = {} 
-
-SelRegions["Подуяне"] = 12
-SelRegions["Надежда"] = 8
-SelRegions["Кремиковци"] = 8
+runs = 100
 
 start = timeit.default_timer()
 
 FullList = pd.read_csv("waiting.csv",encoding='windows-1251') 
+
+regions = set(FullList['region'])
+SelRegions = {region:8 for region in regions}
+SelRegions["Подуяне"] = 10
 
 FullList = FullList.loc[(FullList['born'] == 2017) &  (FullList['tail'] != "Хронични") & (FullList['id'] != idn), ]
 FullList.reset_index(inplace=True,drop = True)
@@ -34,10 +32,11 @@ places = FullList[['kg','region','tail','places']].drop_duplicates()
 places = pd.pivot_table(places, values = 'places', index=['kg','region'], columns = 'tail',fill_value=0).reset_index()
 places.set_index('kg',inplace=True)
 
+KgList = places
 KgList = places.loc[places['region'].isin(["Подуяне","Кремиковци"]),]
 KgList = KgList['region'].to_dict()
 
-KgList = {item:KgList.get(item) for item in ["СДЯ №58","ДГ №69 Жар птица (с яслени групи)"]}
+#KgList = {item:KgList.get(item) for item in ["СДЯ №58","ДГ №69 Жар птица (с яслени групи)"]}
 
  #["ДГ №110 Слънчева мечта (с яслени групи)","ДГ №89 Шарена дъга (с яслени групи)"]
 
@@ -117,5 +116,5 @@ for key,value in list_apps.items():
             if app.admitted >0:
                 chances+=app.admitted
     if chances >0:
-        print("Вероятност за",key,chances/runs) 
+        print(KgList[key], key,  chances/runs) 
 
