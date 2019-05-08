@@ -24,10 +24,10 @@ class KidsSpider(scrapy.Spider):
     def parse(self, response):
         pages = response.xpath('//table/tr/td/a/@href').extract()
         for page in pages:
- #           if page is not None:
             abs_page = response.urljoin(page.split(";",1)[0])
             first = Table()
             first['webpage'] = abs_page
+            #yield first
             yield Request(abs_page, meta={'item':first}, callback = self.parse_kg)
             
     def parse_kg(self, response):
@@ -36,15 +36,17 @@ class KidsSpider(scrapy.Spider):
         region = response.xpath('//td[contains(text(),"Район")]/following-sibling::td/strong/text()').get(default = "NA")
         #address = response.xpath('//td[contains(text(),"Адрес")]/following-sibling::td//text()').get(default = "NA")
         second = Table()
-        pages = response.xpath('//td[contains(text(),"от септември")]/following-sibling::td[1]//a[contains(@href,"waiting")]/@href').extract()
-      # if pages:
+        pages = response.xpath('//div[contains(text(),"с прием от септември")]/following-sibling::div//td[contains(text(),"родени")]/following-sibling::td[1]//a[contains(@href,"waiting")]/@href').extract()
+        #pages = response.xpath('//td[contains(text(),"от септември")]/following-sibling::td[1]//a[contains(@href,"waiting")]/@href').extract()# pages = response.xpath('//div[contains(text(),"с прием от септември")]/following-sibling::div//td[contains(text(),"родени")]/following-sibling::td[1]//a[contains(@href,"waiting")]/@href').extract()
+        #if pages:
         for page in pages:
-            abs_page = response.urljoin(page)
-            second['kg'] = kg
-            second['region'] = region
-            second['webpage'] = first['webpage']
-            
-            yield Request(abs_page, meta={'item':second}, callback = self.parse_waiting)
+            if page is not None:
+                abs_page = response.urljoin(page)
+                second['kg'] = kg
+                second['region'] = region
+                second['webpage'] = first['webpage']
+                #yield second
+                yield Request(abs_page, meta={'item':second}, callback = self.parse_waiting)
             
     def parse_waiting(self,response):
         second = response.request.meta['item']

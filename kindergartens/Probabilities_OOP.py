@@ -10,7 +10,7 @@ import locale
 import timeit
 import random
 
-runs = 500
+runs = 1000
 
 locale.setlocale(locale.LC_CTYPE, 'bulgarian')
 
@@ -20,7 +20,7 @@ start = timeit.default_timer()
 
 FullList = pd.read_csv("waiting.csv",encoding='windows-1251') 
 
-FullList = FullList.loc[(FullList['born'] == 2016) & (FullList['tail'] != "Хронични"), ]
+FullList = FullList.loc[(FullList['born'] == 2017) & (FullList['tail'] != "Хронични"), ]
 FullList.reset_index(inplace=True,drop = True)
 
 places = FullList[['kg','region','tail','places']].drop_duplicates()
