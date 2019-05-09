@@ -54,7 +54,7 @@ class App:
         self.admitted = admitted
 
     
-random.seed(500)  
+#random.seed(500)  
 
 list_apps = {}  
 
