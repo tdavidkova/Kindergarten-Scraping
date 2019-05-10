@@ -4,7 +4,7 @@ for(p in requiredPackages){
   if(!require(p,character.only = TRUE)) install.packages(p)
   library(p,character.only = TRUE)
 }
-setwd("C:/Git/Kindergarten-Scraping/kindergartens")
+setwd("C:/Documents/GitHub/Kindergarten-Scraping/kindergartens")
 Sys.setlocale("LC_CTYPE", "bulgarian")
 
 path_to_report = "waiting.csv"
@@ -68,7 +68,7 @@ updated = ""
 Fill <- Fill[Fill$tail!="Социални",]
 
 #region <-Fill %>% filter (tail == "Общи" & born == 2016) %>% 
-region <-Fill %>% filter (tail == "Общи" & born == 2016) %>% 
+region <-Fill %>% filter (born == 2016) %>% 
   group_by(region) %>% 
   summarise(index = round(sum(applications)/sum(places),1), sum(places)) %>% 
   arrange( desc(index))
@@ -117,7 +117,7 @@ plot2 <- ggplot(region, aes(x=region, y =index,fill = index )) +
 
 
 #region <-Fill %>% filter (tail == "Общи" & born == 2018) %>% 
-region <-Fill %>% filter (tail == "Общи" & born == 2018) %>%   
+region <-Fill %>% filter (born == 2018) %>%   
   group_by(region) %>% 
   summarise(index = round(sum(applications)/sum(places),1), sum(places)) %>% 
   arrange( desc(index))
@@ -137,6 +137,45 @@ plot3 <- ggplot(region, aes(x=region, y =index,fill = index )) +
   annotate("text", x = c(2), y = c(5.5), label = c(updated) , color="black", size=3 ,  fontface="bold")+
   theme(legend.position="none")
 
+region <-Fill %>% filter (born == 2014) %>%   
+  group_by(region) %>% 
+  summarise(index = round(sum(applications)/sum(places),1), sum(places)) %>% 
+  arrange( desc(index))
+
+region$region <- factor(region$region, levels = region[order(region$index),]$region)
+
+
+plot4 <- ggplot(region, aes(x=region, y =index,fill = index )) +
+  geom_bar(stat="identity") + 
+  scale_fill_gradient2(low="dark green", mid = "yellow" ,
+                       high="dark red",midpoint = 3, name = "")+
+  #scale_y_continuous(limits = c(0,8)) +
+  coord_flip()+
+  geom_text(aes(label=index), size =2.3,hjust=-0.25)+
+  scale_x_discrete(name="")+
+  scale_y_continuous(name="Брой деца за едно място")+
+  annotate("text", x = c(2), y = c(5.5), label = c(updated) , color="black", size=3 ,  fontface="bold")+
+  theme(legend.position="none")
+
+region <-Fill %>% filter (born == 2013) %>%   
+  group_by(region) %>% 
+  summarise(index = round(sum(applications)/sum(places),1), sum(places)) %>% 
+  arrange( desc(index))
+
+region$region <- factor(region$region, levels = region[order(region$index),]$region)
+
+
+plot5 <- ggplot(region, aes(x=region, y =index,fill = index )) +
+  geom_bar(stat="identity") + 
+  scale_fill_gradient2(low="dark green", mid = "yellow" ,
+                       high="dark red",midpoint = 3, name = "")+
+  #scale_y_continuous(limits = c(0,8)) +
+  coord_flip()+
+  geom_text(aes(label=index), size =2.3,hjust=-0.25)+
+  scale_x_discrete(name="")+
+  scale_y_continuous(name="Брой деца за едно място")+
+  annotate("text", x = c(2), y = c(5.5), label = c(updated) , color="black", size=3 ,  fontface="bold")+
+  theme(legend.position="none")
 
 
 
@@ -175,8 +214,8 @@ ft <- flextable(data = FillByYear) %>%
   width(c(2,4,5),1.1) %>%
   width(3, .8) %>%
   align( align = "right", j=5, part = "all") %>%
-  italic(i=c(2,6,10), j = 2:5, italic = TRUE, part = "body")%>%
-  padding(i=c(2,6,10), j = 2, padding = NULL, padding.top = NULL,
+  italic(i=c(2,6,10,14,18), j = 2:5, italic = TRUE, part = "body")%>%
+  padding(i=c(2,6,10,14,18), j = 2, padding = NULL, padding.top = NULL,
           padding.bottom = NULL, padding.left = 15, padding.right = NULL,
           part = "body")
 
@@ -185,9 +224,10 @@ ft <- flextable(data = FillByYear) %>%
 ft
 
 doc <- doc %>% 
-  body_add_par("Кампания детски градини и ясли май 2019", style = "heading 1") %>% 
+  body_add_par("Кампания за прием в детски градини и ясли от септември 2019 - обобщение на резултатите*", style = "heading 1") %>% 
+  body_add_par("*Източник: ИСОДЗ", style = "Normal") %>% 
   body_add_par("", style = "heading 2") %>%
-  body_add_par("Брой кандидати и места в кампания 2019/2020", style = "table title") %>%
+  body_add_par("Брой кандидати и места в първо класиране", style = "table title") %>%
   body_add_flextable(ft) %>% 
   body_add_par("", style = "heading 2") %>% 
   body_add_break()%>%
@@ -205,6 +245,16 @@ doc <- doc %>%
   body_add_par("Родени 2016", style = "heading 3") %>% 
   body_add_par("", style = "Normal") %>% # blank paragraph
   body_add_gg(value = plot1, style = "centered" ) %>%
+  body_add_par("", style = "Normal") %>% # blank paragraph
+  body_add_break()%>%
+  body_add_par("Родени 2014", style = "heading 3") %>% 
+  body_add_par("", style = "Normal") %>% # blank paragraph
+  body_add_gg(value = plot4, style = "centered" ) %>%
+  body_add_par("", style = "Normal") %>% # blank paragraph
+  body_add_break()%>%  
+  body_add_par("Родени 2013", style = "heading 3") %>% 
+  body_add_par("", style = "Normal") %>% # blank paragraph
+  body_add_gg(value = plot5, style = "centered" ) %>%
   body_add_par("", style = "Normal") %>% # blank paragraph
 
 

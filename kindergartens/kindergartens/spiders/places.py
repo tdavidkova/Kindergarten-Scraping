@@ -33,7 +33,7 @@ class PlacesSpider(scrapy.Spider):
         region = response.xpath('//td[contains(text(),"Район")]/following-sibling::td/strong/text()').get(default = "NA")
         #address = response.xpath('//td[contains(text(),"Адрес")]/following-sibling::td//text()').get(default = "NA")
         second = Table()
-        pages = response.xpath('//td[contains(text(),"от септември")]/following-sibling::td[1]//a[contains(@href,"waiting")]/@href').extract()
+        pages = response.xpath('//div[contains(text(),"с прием от септември")]/following-sibling::div//td[contains(text(),"родени")]/following-sibling::td[1]//a[contains(@href,"waiting")]/@href').extract()
       # if pages:
         for page in pages:
             abs_page = response.urljoin(page)
