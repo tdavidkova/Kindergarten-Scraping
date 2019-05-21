@@ -6,14 +6,11 @@ from scrapy.http import Request
 class Table(scrapy.Item):
     kg = scrapy.Field()
     region = scrapy.Field()
-    webpage = scrapy.Field()
     born = scrapy.Field()
-    places = scrapy.Field()
-    tail = scrapy.Field()
     name = scrapy.Field()
     id = scrapy.Field()
     points = scrapy.Field()
-    preference = scrapy.Field()
+    webpage = scrapy.Field()
     
 class AdmittedSpider(scrapy.Spider):
     name = 'admitted'
@@ -36,7 +33,7 @@ class AdmittedSpider(scrapy.Spider):
         region = response.xpath('//td[contains(text(),"Район")]/following-sibling::td/strong/text()').get(default = "NA")
         #address = response.xpath('//td[contains(text(),"Адрес")]/following-sibling::td//text()').get(default = "NA")
         second = Table()
-        pages = response.xpath('//b[contains(text(),"КЛАСИРАНИ на 11.05.2019г.")]/ancestor::a/@href').extract()
+        pages = response.xpath('//div[contains(text(),"Групи с прием от септември")]/following-sibling::div//b[contains(text(),"КЛАСИРАНИ на 11.05.2019г.")]/ancestor::a/@href').extract()
         #if pages:
         for page in pages:
             if page is not None:
@@ -50,22 +47,21 @@ class AdmittedSpider(scrapy.Spider):
     def parse_admitted(self,response):
         second = response.request.meta['item']
         born = response.xpath('//strong[contains(text(),"Набор")]/text()').get().split()[-1]
-        # rows = response.selector.xpath('//table//tr/td[contains(text(),"")]/ancestor::tr')
-        # for row in rows:
-            # if row.xpath('td/text()').extract() is not None:
-                # name = row.xpath('td/text()').extract()[1]
-                # number = row.xpath('td/text()').extract()[2]
-                # points = row.xpath('td/text()').extract()[3]
-        third = Table()        
-        third['kg'] = second['kg']
-        third['region'] = second['region']
-        third['born'] = born
-                # third['name'] = name
-                # third['id'] = number
-                # third['points'] = points
-
+        rows = response.selector.xpath('//table//tr/td[contains(text(),"")]/ancestor::tr')
+        for row in rows:
+            if len(row.xpath('td/text()')) >0:
+                name = row.xpath('td/text()').extract()[1]
+                number = row.xpath('td/text()').extract()[2]
+                points = row.xpath('td/text()').extract()[3]
+                third = Table()        
+                third['kg'] = second['kg']
+                third['region'] = second['region']
+                third['born'] = born
+                third['name'] = name
+                third['id'] = number
+                third['points'] = points
             
-        yield third
+                yield third
 
         
         
